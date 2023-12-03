@@ -1,0 +1,19 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/firebase",
+        "-f",
+        "scripts/Dockerfile.firebase",
+        ".",
+      ]
+
+substitutions:
+  _REPO_NAME: demo
+
+images:
+  - "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/firebase"
+
+tags: ["cloud-builders-community"]

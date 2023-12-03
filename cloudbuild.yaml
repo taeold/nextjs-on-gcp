@@ -1,0 +1,36 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "--network",
+        "cloudbuild",
+        "-t",
+        "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/nextjs-on-gcp",
+        ".",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      ["push", "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/nextjs-on-gcp"]
+
+  - name: "gcr.io/cloud-builders/gcloud-slim"
+    args:
+      [
+        "run",
+        "deploy",
+        "nextjs-on-gcp",
+        "--image",
+        "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/nextjs-on-gcp",
+        "--region",
+        "$LOCATION",
+        "--platform",
+        "managed",
+        "--allow-unauthenticated",
+      ]
+
+images:
+  - "us-central1-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/nextjs-on-gcp"
+
+substitutions:
+  _REPO_NAME: demo

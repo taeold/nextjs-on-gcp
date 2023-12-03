@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+  experimental: {
+    isrMemoryCacheSize: 0, // disable default in-memory caching
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
