@@ -4,6 +4,7 @@ import RevalidateButton from "./revalidateButton";
 export default async function DemandRevlidatedPage() {
   const resp = await fetch("https://httpbin.org/uuid", {
     next: {
+      revalidate: 100000,
       tags: ["uuid"],
     },
   });
