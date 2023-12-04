@@ -15,6 +15,14 @@ exe() { echo "\$ $@" ; "$@" ; }
 
 qexe() { "$@" > /dev/null 2>&1 ; }
 
+curl_with_auth() {
+    local token="$(gcloud auth print-access-token --project $PROJECT_ID)"
+
+    curl --fail "$@" \
+        -H "Authorization: Bearer $token" \
+        -H "x-goog-user-project: $PROJECT_ID"
+}
+
 # Parse the command line arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -46,6 +54,27 @@ fi
 
 echo "Setting up project $PROJECT_ID in region $REGION"
 
+echo
+echo "========================================================="
+echo "Checking required tools"
+echo "========================================================="
+if ! qexe which gcloud; then
+    echo "Error: gcloud is not installed"
+    echo "Visit https://cloud.google.com/sdk/docs/install for installation instructions."
+    exit 1
+else
+    echo "gcloud is installed"
+fi
+
+if ! which firebase > /dev/null 2>&1; then
+    echo "Error: firebase is not installed"
+    echo "Visit https://firebase.google.com/docs/cli for installation instructions."
+    exit 1
+else
+    echo "firebase is installed"
+fi
+
+echo
 echo "========================================================="
 echo "Checking Billing Info"
 echo "========================================================="
@@ -57,54 +86,47 @@ if ! gcloud billing projects describe $PROJECT_ID | grep "billingEnabled: true" 
 fi
 echo "Billing is enabled for project $PROJECT_ID"
 
-
 echo
 echo "========================================================="
 echo "Enabling Required Google Cloud Platfrom APIs"
 echo "========================================================="
 exe gcloud services enable run.googleapis.com --project $PROJECT_ID
 exe gcloud services enable cloudbuild.googleapis.com --project $PROJECT_ID
-exe gcloud services enable firestore.googleapis.com --project $PROJECT_ID
-
 
 echo
 echo "========================================================="
-echo "Creating Firestore instance"
+echo "Enabling Required Firebase APIs"
 echo "========================================================="
-if qexe gcloud firestore databases describe --project $PROJECT_ID; then
-    echo "Skipping. Firestore instance already exists"
+exe gcloud services enable firebase.googleapis.com --project $PROJECT_ID
+exe gcloud services enable firebasedatabase.googleapis.com --project $PROJECT_ID
+
+echo
+echo "========================================================="
+echo "Adding Firebase to Google Cloud Project"
+echo "========================================================="
+if qexe curl_with_auth https://firebase.googleapis.com/v1beta1/projects/$PROJECT_ID; then
+    echo "Skipping. Firebase already added to project $PROJECT_ID"
 else
-    FIRESTORE_REGION=$REGION
-    if [[ "$REGION" == "us-central1" || "$REGION" == "us-central2" ]]; then
-        # Use multi-region for us-central1 and us-central2
-        echo "Creating Firestore instance in multi-region nam5 instead of $REGION"
-        FIRESTORE_REGION="nam5"
-    fi
-    exe gcloud firestore databases create --location $FIRESTORE_REGION --project $PROJECT_ID
+    echo "Adding Firebase to project $PROJECT_ID"
+    exe curl_with_auth -X POST https://firebase.googleapis.com/v1beta1/projects/$PROJECT_ID:addFirebase
 fi
-# echo
-# echo "========================================================="
-# echo "Enabling Required Firebase APIs"
-# echo "========================================================="
-# exe gcloud services enable firebase.googleapis.com --project $PROJECT_ID
 
-
-# echo
-# echo "========================================================="
-# echo "Adding Firebase to Google Cloud Project"
-# echo "========================================================="
-# if qexe curl https://firebase.googleapis.com/v1beta1/projects/$PROJECT_ID \
-#     -H "Authorization: Bearer $(gcloud auth print-access-token --project $PROJECT_ID)" \
-#     -H "x-goog-user-project: $PROJECT_ID"; then
-#     echo "Skipping. Firebase already added to project $PROJECT_ID"
-# else
-#     echo "Adding Firebase to project $PROJECT_ID"
-#     exe curl -X POST https://firebase.googleapis.com/v1beta1/projects/$PROJECT_ID:addFirebase \
-#         -H "Authorization: Bearer $(gcloud auth print-access-token --project $PROJECT_ID)" \
-#         -H "x-goog-user-project: $PROJECT_ID";
-# fi
-
-
+echo
+echo "========================================================="
+echo "Creating Firebase Realtime Database instance"
+echo "========================================================="
+DEFAULT_DATABASE="$PROJECT_ID-default-rtdb"
+if qexe curl_with_auth \
+        https://firebasedatabase.googleapis.com/v1beta/projects/$PROJECT_ID/locations/$REGION/instances/$DEFAULT_DATABASE; then
+    echo "Skipping. Firebase Realtime Database instance already exists"
+else
+    echo "Creating Firebase Realtime Database instance"
+    exe curl_with_auth \
+        -X POST \
+        "https://firebasedatabase.googleapis.com/v1beta/projects/$PROJECT_ID/locations/$REGION/instances?databaseId=$DEFAULT_DATABASE" \
+        -H "Content-Type: application/json" \
+        --data '{"name":"projects/$PROJECT_ID/locations/$REGION/instances/$DEFAULT_DATABASE","type":"DEFAULT_DATABASE"}'
+fi
 
 echo
 echo "========================================================="

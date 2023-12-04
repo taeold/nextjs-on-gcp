@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:firestore": "FIRESTORE_EMULATOR_HOST=localhost:8080 next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
+    "dev:fb": "firebase emulators:exec --ui 'next dev'",
+    "build:fb": "firebase emulators:exec --ui 'next build'",
+    "start:fb": "firebase emulators:exec --ui 'node .next/standalone/server.js'",
     "lint": "next lint"
   },
   "dependencies": {
