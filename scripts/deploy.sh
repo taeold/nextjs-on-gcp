@@ -69,3 +69,9 @@ exe gcloud builds submit \
     --region $REGION \
     --substitutions _REPO_NAME=$REPO_NAME,_DATABASE_URL="http://$DEFAULT_DATABASE.firebaseio.com" \
     .
+
+echo
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo "Deploy Complete"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo "Visit https://$PROJECT_ID.web.app. Enjoy!"

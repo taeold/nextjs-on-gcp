@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ID=""
@@ -91,7 +92,9 @@ echo "========================================================="
 echo "Enabling Required Google Cloud Platfrom APIs"
 echo "========================================================="
 exe gcloud services enable run.googleapis.com --project $PROJECT_ID
+qexe gcloud run regions list # Call Cloud Run API to kickstart JIT provisioning
 exe gcloud services enable cloudbuild.googleapis.com --project $PROJECT_ID
+qexe gcloud builds list # Call Cloud Build API to kickstart JIT provisioning
 
 echo
 echo "========================================================="
@@ -109,6 +112,7 @@ if qexe curl_with_auth https://firebase.googleapis.com/v1beta1/projects/$PROJECT
 else
     echo "Adding Firebase to project $PROJECT_ID"
     exe curl_with_auth -X POST https://firebase.googleapis.com/v1beta1/projects/$PROJECT_ID:addFirebase
+    sleep 5 # Wait for long running operation to complete
 fi
 
 echo
@@ -126,6 +130,7 @@ else
         "https://firebasedatabase.googleapis.com/v1beta/projects/$PROJECT_ID/locations/$REGION/instances?databaseId=$DEFAULT_DATABASE" \
         -H "Content-Type: application/json" \
         --data '{"name":"projects/$PROJECT_ID/locations/$REGION/instances/$DEFAULT_DATABASE","type":"DEFAULT_DATABASE"}'
+    sleep 5 # Wait for long running operation to complete
 fi
 
 echo
@@ -158,6 +163,7 @@ echo
 echo "Granting the IAM Service Account User role to the Cloud Build service account for the Cloud Run runtime service account:"
 exe gcloud iam service-accounts add-iam-policy-binding \
     $PROJECT_NUMBER-compute@developer.gserviceaccount.com \
+    --project $PROJECT_ID \
     --member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com \
     --role=roles/iam.serviceAccountUser
 
@@ -180,7 +186,7 @@ fi
 
 echo
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-echo " Setup Complete"
+echo "Setup Complete"
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 echo "Deploy the app by running:"
-echo "  ./script/deploy.sh -p $PROJECT_ID -r $REGION"
+echo "  ./scripts/deploy.sh -p $PROJECT_ID -r $REGION"

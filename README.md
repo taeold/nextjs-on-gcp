@@ -21,7 +21,7 @@ Use the [`setup.sh`](scripts/setup.sh) to provision your GCP project:
 ./scripts/setup.sh -p my-project -r us-central1
 ```
 
-Then, build deploy the application on [Cloud Build](https://cloud.google.com/build/docs/overview). Use the [`deploy.sh`](scripts/deploy.sh) to quickly get started:
+Then, build and deploy the application on [Cloud Build](https://cloud.google.com/build/docs/overview). Use the [`deploy.sh`](scripts/deploy.sh) to quickly get started:
 
 ```bash
 ./scripts/deploy.sh -p my-project -r us-central1
