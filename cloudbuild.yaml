@@ -29,15 +29,6 @@ steps:
     args:
       ["push", "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/nextjs-on-gcp"]
 
-  - name: "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/firebase"
-    script: |
-      #!/usr/bin/env /usr/bin/bash
-      set -eux pipefail
-
-      mkdir public/_next
-      mv .next/static public/_next
-      firebase deploy --project $PROJECT_ID --only hosting
-
   - name: "gcr.io/cloud-builders/gcloud-slim"
     args:
       [
@@ -54,6 +45,15 @@ steps:
         "--set-env-vars",
         '^@^BUILD_ID=$BUILD_ID@FIREBASE_CONFIG={"projectId":"$PROJECT_ID","databaseURL":"$_DATABASE_URL"}@PUBLIC_URL=https://$PROJECT_ID.web.app',
       ]
+
+  - name: "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/firebase"
+    script: |
+      #!/usr/bin/env /usr/bin/bash
+      set -eux pipefail
+
+      mkdir public/_next
+      mv .next/static public/_next
+      firebase deploy --project $PROJECT_ID --only hosting
 
 images:
   - "us-central1-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/nextjs-on-gcp"
