@@ -8,7 +8,7 @@ export default function RevalidateButton() {
   async function handleClick(e: any) {
     e.preventDefault();
     await fetch("/api/revalidate", { method: "POST" });
-    router.refresh();
+    location.reload();
   }
 
   return (
