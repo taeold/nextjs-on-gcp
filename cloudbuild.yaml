@@ -9,6 +9,7 @@ steps:
     env:
       - "NODE_ENV=production"
       - "NEXT_TELEMETRY_DISABLED=1"
+      - "BUILD_ID=$BUILD_ID"
       - 'FIREBASE_CONFIG={"projectId":"$PROJECT_ID","databaseURL":"$_DATABASE_URL"}'
 
   - name: "gcr.io/cloud-builders/docker"
@@ -23,6 +24,10 @@ steps:
         "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/nextjs-on-gcp",
         ".",
       ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      ["push", "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/nextjs-on-gcp"]
 
   - name: "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/firebase"
     script: |
@@ -47,7 +52,7 @@ steps:
         "managed",
         "--allow-unauthenticated",
         "--set-env-vars",
-        '^@^BUILD_ID=$BUILD_ID@FIREBASE_CONFIG={"projectId":"$PROJECT_ID","databaseURL":"$_DATABASE_URL"}',
+        '^@^BUILD_ID=$BUILD_ID@FIREBASE_CONFIG={"projectId":"$PROJECT_ID","databaseURL":"$_DATABASE_URL"}@PUBLIC_URL=https://$PROJECT_ID.web.app',
       ]
 
 images:
