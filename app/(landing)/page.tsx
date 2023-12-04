@@ -32,7 +32,11 @@ export default function Home() {
       </p>
       <p className="m-0 text-center font-mono">
         View the source on{" "}
-        <a href="http://github.com" target="_blank" rel="noopener noreferrer">
+        <a
+          href="https://github.com/taeold/nextjs-on-gcp"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           GitHub
         </a>
       </p>
