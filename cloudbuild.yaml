@@ -1,12 +1,22 @@
 steps:
+  - name: node:20.5.1-bookworm-slim
+    entrypoint: npm
+    args: ["ci"]
+
+  - name: node:20.5.1-bookworm-slim
+    entrypoint: npm
+    args: ["run", "build"]
+    env:
+      - "NODE_ENV=production"
+      - "NEXT_TELEMETRY_DISABLED=1"
+      - 'FIREBASE_CONFIG={"projectId":"$PROJECT_ID","databaseURL":"$_DATABASE_URL"}'
+
   - name: "gcr.io/cloud-builders/docker"
     args:
       [
         "build",
         "--build-arg",
         "BUILD_ID=$BUILD_ID",
-        "--build-arg",
-        'FIREBASE_CONFIG={"projectId":"$PROJECT_ID","databaseURL":"$_DATABASE_URL"}',
         "--network",
         "cloudbuild",
         "-t",
@@ -14,9 +24,14 @@ steps:
         ".",
       ]
 
-  - name: "gcr.io/cloud-builders/docker"
-    args:
-      ["push", "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/nextjs-on-gcp"]
+  - name: "$LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/firebase"
+    script: |
+      #!/usr/bin/env /usr/bin/bash
+      set -eux pipefail
+
+      mkdir public/_next
+      mv .next/static public/_next
+      firebase deploy --project $PROJECT_ID --only hosting
 
   - name: "gcr.io/cloud-builders/gcloud-slim"
     args:
@@ -40,4 +55,8 @@ images:
 
 substitutions:
   _REPO_NAME: demo
-  _DATABASE_URL: "https://${PROJECT_ID}-default-rtdb.firebaseio.com"
+  _DATABASE_URL: https://$PROJECT_ID-default-rtdb.firebaseio.com
+
+options:
+  automapSubstitutions: true
+  dynamicSubstitutions: true

@@ -161,29 +161,26 @@ exe gcloud iam service-accounts add-iam-policy-binding \
     --member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com \
     --role=roles/iam.serviceAccountUser
 
-    # echo
-    # echo "========================================================="
-    # echo "Preparing Firebase Builder Image"
-    # echo "========================================================="
-    # FB_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/firebase"
-    # if gcloud artifacts docker images describe $FB_IMAGE > /dev/null 2>&1; then
-    #     echo "Skipping. Firebase builder image $FB_IMAGE already exists"
-    # else
-    #     echo "Building and publishing image $FB_IMAGE"
-    #     exe gcloud builds submit --config $SCRIPT_DIR/cloudbuild.firebase.yaml \
-    #         --project $PROJECT_ID \
-    #         --region $REGION \
-    #         --substitutions _REPO_NAME=$REPO_NAME \
-    #         .
-    # fi
+echo
+echo "========================================================="
+echo "Preparing Firebase Builder Image"
+echo "========================================================="
+FB_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/firebase"
+if qexe gcloud artifacts docker images describe $FB_IMAGE; then
+    echo "Skipping. Firebase builder image $FB_IMAGE already exists"
+else
+    echo "Building and publishing image $FB_IMAGE"
+    exe gcloud builds submit --config $SCRIPT_DIR/cloudbuild.firebase.yaml \
+        --project $PROJECT_ID \
+        --region $REGION \
+        --substitutions _REPO_NAME=$REPO_NAME \
+        .
+fi
 
 
 echo
-echo "========================================================="
-echo "Building and Deploying the Application to Cloud Run"
-echo "========================================================="
-exe gcloud builds submit \
-    --project $PROJECT_ID \
-    --region $REGION \
-    --substitutions _REPO_NAME=$REPO_NAME,_DATABASE_URL="http://$DEFAULT_DATABASE.firebaseio.com" \
-    .
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo " Setup Complete"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo "Deploy the app by running:"
+echo "  ./script/deploy.sh -p $PROJECT_ID -r $REGION"

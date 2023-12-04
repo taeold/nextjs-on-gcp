@@ -1,34 +1,19 @@
-FROM node:20.5.1-bookworm-slim AS base
-
-FROM base AS deps
+FROM node:20.5.1-bookworm-slim
 WORKDIR /app
-
-COPY package.json package-lock.json ./
-RUN npm ci
-
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
 
 ARG BUILD_ID
-ARG FIREBASE_CONFIG
 ENV NODE_ENV=production \
     BUILD_ID=$BUILD_ID \
-    FIREBASE_CONFIG=$FIREBASE_CONFIG \
     NEXT_TELEMETRY_DISABLED=1
 
-RUN npm run build
-
-FROM base AS runner
-WORKDIR /app
-COPY --from=builder /app/public ./public
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
 RUN mkdir .next
+RUN chown nextjs:nodejs .next
 
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+COPY --chown=nextjs:nodejs .next/standalone ./
+COPY --chown=nextjs:nodejs .next/static ./.next/static
 
-ENV NODE_ENV=production \
-    NEXT_TELEMETRY_DISABLED=1
+USER nextjs
 CMD ["node", "server.js"]
