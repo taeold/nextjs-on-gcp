@@ -10,7 +10,7 @@ async function Skeleton() {
 }
 
 async function SlowComponent() {
-  await sleep(2000);
+  await sleep(3000);
   return <p className="font-mono">Streaming!</p>;
 }
 
@@ -19,6 +19,7 @@ export default async function SsrPage() {
     cache: "no-store",
   });
   const { uuid } = await resp.json();
+  await sleep(1000);
 
   return (
     <>
