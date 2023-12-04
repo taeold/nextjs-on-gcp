@@ -23,7 +23,7 @@ export default async function SsrPage() {
 
   return (
     <>
-      <h2>A server generated page! </h2>
+      <h2>A server-streamed page (intentionally slow)! </h2>
       <p className="font-mono">Generated {now()}</p>
       <p className="font-mono">UUID: {uuid}</p>
       <React.Suspense fallback={<Skeleton />}>
