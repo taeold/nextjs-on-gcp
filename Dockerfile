@@ -6,8 +6,8 @@ ENV NODE_ENV=production \
     BUILD_ID=$BUILD_ID \
     NEXT_TELEMETRY_DISABLED=1
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 777 nodejs
+RUN adduser --system --uid 777 nextjs
 
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
