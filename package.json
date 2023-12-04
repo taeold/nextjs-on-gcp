@@ -8,7 +8,7 @@
     "start": "node .next/standalone/server.js",
     "dev:fb": "firebase emulators:exec --ui 'next dev'",
     "build:fb": "firebase emulators:exec --ui 'next build'",
-    "start:fb": "firebase emulators:exec --ui 'node .next/standalone/server.js'",
+    "start:fb": "firebase emulators:exec --ui 'next start'",
     "lint": "next lint"
   },
   "dependencies": {

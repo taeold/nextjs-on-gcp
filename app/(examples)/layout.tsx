@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={font.className}>
-        <main className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50 py-8 lg:py-12">
+        <main className="relative flex min-h-screen flex-col overflow-hidden bg-gray-50 py-8 lg:py-12">
           <a href="/">
             <div className="mx-auto w-full px-4 pb-2 md:mx-auto md:max-w-3xl lg:max-w-4xl">
               <svg
@@ -30,7 +30,7 @@ export default function RootLayout({
               </svg>
             </div>
           </a>
-          <div className="w-full bg-white px-6 py-8 shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5 md:mx-auto md:max-w-3xl lg:max-w-4xl lg:pb-28 lg:pt-16">
+          <div className="min-h-[15rem] w-full bg-white px-6 py-8 shadow-xl shadow-slate-700/10 ring-1 ring-gray-900/5 md:mx-auto md:max-w-3xl lg:max-w-4xl lg:pb-28 lg:pt-16">
             <article className="prose prose-slate lg:prose-lg mx-auto mt-4">
               {children}
             </article>

@@ -64,6 +64,10 @@ export default function Home() {
           <Link href="/ssr">
             <Chip>/ssr</Chip>
           </Link>{" "}
+          and{" "}
+          <Link href="/ssr/streaming">
+            <Chip>/ssr/streaming</Chip>
+          </Link>{" "}
           page to see the server in action.
         </p>
         <h3>Global CDN</h3>
