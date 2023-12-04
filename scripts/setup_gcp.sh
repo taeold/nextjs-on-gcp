@@ -149,7 +149,11 @@ echo "Granting the Cloud Run Admin role to the Cloud Build service account:"
 exe gcloud projects add-iam-policy-binding $PROJECT_ID \
     --member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com \
     --role=roles/run.admin
-
+echo
+echo "Granting the Firebase Admin role the Cloud Build service account:"
+exe gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com \
+    --role=roles/firebase.admin
 echo
 echo "Granting the IAM Service Account User role to the Cloud Build service account for the Cloud Run runtime service account:"
 exe gcloud iam service-accounts add-iam-policy-binding \
@@ -181,5 +185,5 @@ echo "========================================================="
 exe gcloud builds submit \
     --project $PROJECT_ID \
     --region $REGION \
-    --substitutions _REPO_NAME=$REPO_NAME \
+    --substitutions _REPO_NAME=$REPO_NAME,_DATABASE_URL="http://$DEFAULT_DATABASE.firebaseio.com" \
     .

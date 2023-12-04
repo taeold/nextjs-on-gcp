@@ -3,6 +3,10 @@ steps:
     args:
       [
         "build",
+        "--build-arg",
+        "BUILD_ID=$BUILD_ID",
+        "--build-arg",
+        'FIREBASE_CONFIG={"projectId":"$PROJECT_ID","databaseURL":"$_DATABASE_URL"}',
         "--network",
         "cloudbuild",
         "-t",
@@ -27,6 +31,8 @@ steps:
         "--platform",
         "managed",
         "--allow-unauthenticated",
+        "--set-env-vars",
+        '^@^BUILD_ID=$BUILD_ID@FIREBASE_CONFIG={"projectId":"$PROJECT_ID","databaseURL":"$_DATABASE_URL"}',
       ]
 
 images:
@@ -34,3 +40,4 @@ images:
 
 substitutions:
   _REPO_NAME: demo
+  _DATABASE_URL: "https://${PROJECT_ID}-default-rtdb.firebaseio.com"

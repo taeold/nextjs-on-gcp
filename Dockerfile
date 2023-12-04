@@ -11,12 +11,17 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+ARG BUILD_ID
+ARG FIREBASE_CONFIG
 ENV NODE_ENV=production \
+    BUILD_ID=$BUILD_ID \
+    FIREBASE_CONFIG=$FIREBASE_CONFIG \
     NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build
 
 FROM base AS runner
+WORKDIR /app
 COPY --from=builder /app/public ./public
 
 RUN mkdir .next
