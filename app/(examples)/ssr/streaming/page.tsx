@@ -6,7 +6,7 @@ function sleep(ms: number) {
 }
 
 async function Skeleton() {
-  return <p className="font-mono">Loading...</p>;
+  return <p className="animate-pulse bg-red-100 font-mono">Loading...</p>;
 }
 
 async function SlowComponent() {
